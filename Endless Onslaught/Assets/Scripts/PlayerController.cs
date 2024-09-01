@@ -5,80 +5,101 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     #region Components
-    [Header("-----ComponentSerializationService-----")]
+    [Header("----- Components -----")]
+    // Reference to the CharacterController component used for player movement
     [SerializeField] CharacterController characterController;
     #endregion
 
     #region Player Attributes
-    [Header("-----Attributes-----")]
+    [Header("----- Attributes -----")]
+    // Player movement speed
     [Range(1, 20)][SerializeField] int playerSpeed;
+
+    // Sprint multiplier to increase movement speed
     [Range(2, 5)][SerializeField] int sprintMod;
+
+    // Maximum number of jumps allowed before the player must land
     [Range(1, 3)][SerializeField] int jumpMax;
+
+    // Speed applied when the player jumps
     [Range(8, 25)][SerializeField] int jumpSpeed;
+
+    // Gravity applied to the player when they are in the air
     [Range(15, 75)][SerializeField] float gravity;
     #endregion
 
-
+    #region Private Variables
+    // Vector to store player's movement direction
     Vector3 movePlayer;
+
+    // Vector to store player's current velocity (for jumping and gravity)
     Vector3 playerVelocity;
 
+    // Counter to keep track of the number of jumps
     int jumpCount;
 
+    // Boolean to determine if the player is sprinting
     bool isSprinting;
-
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    #endregion
 
     // Update is called once per frame
     void Update()
     {
-        PlayerMovement();
+        PlayerMovement(); // Handle all player movement input and mechanics
     }
 
+    // Handles player movement including walking, running, and jumping
     void PlayerMovement()
     {
-        if(characterController.isGrounded)
+        // Check if the player is grounded
+        if (characterController.isGrounded)
         {
+            // Reset jump count and vertical velocity when grounded
             jumpCount = 0;
-            playerVelocity = Vector3.zero;
+            playerVelocity = Vector3.zero; // Reset vertical velocity
         }
 
+        // Handle sprinting input
         Sprint();
 
+        // Get movement input from the player and calculate movement direction
         movePlayer = Input.GetAxis("Vertical") * transform.forward + Input.GetAxis("Horizontal") * transform.right;
         characterController.Move(playerSpeed * Time.deltaTime * movePlayer);
 
+        // Handle jumping input
         Jump();
 
-        characterController.Move(playerVelocity * Time.deltaTime);
+        // Apply gravity to the player
         playerVelocity.y -= gravity * Time.deltaTime;
-    } 
-    
+        characterController.Move(playerVelocity * Time.deltaTime);
+    }
+
+    // Handles sprinting logic
     void Sprint()
     {
-        if(Input.GetButtonDown("Sprint"))
+        // If the sprint button is pressed down, increase the player's speed
+        if (Input.GetButtonDown("Sprint"))
         {
             playerSpeed *= sprintMod;
             isSprinting = true;
         }
 
-        else if(Input.GetButtonDown("Sprint"))
+        // If the sprint button is released, return the player's speed to normal
+        else if (Input.GetButtonDown("Sprint"))
         {
             playerSpeed /= sprintMod;
             isSprinting = false;
         }
     }
 
+    // Handles jumping logic
     public void Jump()
     {
-        if(Input.GetButtonDown("Jump") && jumpCount < jumpMax)
+        // If the jump button is pressed and the player has jumps left, make the player jump
+        if (Input.GetButtonDown("Jump") && jumpCount < jumpMax)
         {
-            jumpCount++;
-            playerVelocity.y = jumpSpeed;
+            jumpCount++; // Increment jump count
+            playerVelocity.y = jumpSpeed; // Apply jump speed to vertical velocity
         }
     }
 }
