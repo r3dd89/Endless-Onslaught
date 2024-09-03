@@ -85,7 +85,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // If the sprint button is released, return the player's speed to normal
-        else if (Input.GetButtonDown("Sprint"))
+        else if (Input.GetButtonUp("Sprint"))
         {
             playerSpeed /= sprintMod;
             isSprinting = false;
